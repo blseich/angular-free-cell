@@ -3,7 +3,10 @@ var gulp = require('gulp'),
     concat = require('gulp-concat');
 
 gulp.task('default', function() {
-  gulp.src('js/**/*.js')
+  gulp.src([
+    'js/**/*-definition.js',
+    'js/**/*.js'
+  ])
     .pipe(concat('free-cell.js'))
     .pipe(gulp.dest('build/js'));
   gulp.src('views/**/*.html')

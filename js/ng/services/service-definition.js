@@ -1,1 +1,1 @@
-angular.module('services', ['factories'])
+angular.module('services', ['factories']);
