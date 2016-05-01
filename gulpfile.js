@@ -4,8 +4,10 @@ var gulp = require('gulp'),
 
 gulp.task('default', function() {
   gulp.src([
-    'js/**/*-definition.js',
-    'js/**/*.js'
+    'js/modules/*.js',
+    'js/ng/*/*-definition.js',
+    'js/ng/*/*.js',
+    'js/ng/app.js'
   ])
     .pipe(concat('free-cell.js'))
     .pipe(gulp.dest('build/js'));

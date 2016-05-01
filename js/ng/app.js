@@ -4,7 +4,7 @@ angular.module('FreeCell', ['factories', 'services'])
       'playArea',
       'cardService',
       'laneService',
-      function($scope, playArea) {
+      function($scope, playArea, cardService, laneService) {
 
         var cardAlreadySelected;
 
@@ -38,6 +38,7 @@ angular.module('FreeCell', ['factories', 'services'])
             cardAlreadySelected = card;
             cardService.selectCard(card);
           }
+          $scope.$apply();
           return true;
         };
       }])
