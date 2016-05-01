@@ -81,9 +81,6 @@ describe('Controller', function() {
 
       controllerParams.$scope = $scope;
       controllerParams.playArea = {lanes: mockLanes};
-      controllerParams.indexFunctions = {
-        isFirstInLane: function(card) {return true}
-      }
       controller = $controller('FreeCellController', controllerParams);     
     });
 
@@ -196,9 +193,6 @@ describe('Controller', function() {
 
         controllerParams.$scope = $scope;
         controllerParams.playArea = {lanes: mockLanes};
-        controllerParams.indexFunctions = {
-          isFirstInLane: function(card) {return isFirst}
-        }
         controller = $controller('FreeCellController', controllerParams);     
       });
 

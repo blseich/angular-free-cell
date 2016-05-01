@@ -2,10 +2,9 @@ angular.module('FreeCell', ['factories', 'services'])
   .controller('FreeCellController', 
     [ '$scope',
       'playArea',
-      'indexFunctions',
       'cardService',
       'laneService',
-      function($scope, playArea, indexFunctions) {
+      function($scope, playArea) {
 
         var cardAlreadySelected;
 
