@@ -38,7 +38,6 @@ angular.module('FreeCell', ['factories', 'services'])
             cardAlreadySelected = card;
             cardService.selectCard(card);
           }
-          $scope.$apply();
           return true;
         };
       }])
@@ -48,16 +47,15 @@ angular.module('FreeCell', ['factories', 'services'])
       scope: {
         value: '=value',
         suit: '=suit',
-        action: '&ngClick'
+        selected: '=selected'
+        //action: '&ngClick'
       },
       restrict: 'E',
       templateUrl: 'card/card.html',
       link: function(scope, el, attr) {
-        scope.selected = false;
-        el.bind('click', function() {
-          scope.selected = true;
-          scope.action();
-        });
+        // el.bind('click', function() {
+        //   scope.action();
+        // });
       }
     }
 
