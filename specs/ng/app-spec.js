@@ -41,12 +41,12 @@ describe('Controller', function() {
     }
 
     mockCardService = {
-      selectCard: sinon.spy()//,
-      //clearSelected: sinon.spy()
+      selectCard: sinon.spy(),
+      clearSelected: sinon.spy()
     }
 
     mockLaneService = {
-      laneContaining: sinon.stub(),
+      laneContaining: sinon.stub().returns([]),
       autoAssociate: sinon.spy()
     }
 
@@ -55,7 +55,7 @@ describe('Controller', function() {
     beforeEach(module(function($provide) {
       $provide.service('cardService', function() {
         this.selectCard = mockCardService.selectCard;
-        //this.clearSelected = mockCardService.clearSelected;
+        this.clearSelected = mockCardService.clearSelected;
       })
       $provide.service('laneService', function() {
         this.laneContaining = mockLaneService.laneContaining;
@@ -92,7 +92,7 @@ describe('Controller', function() {
 
       it('should select card', function() {
         $scope.takeAction(testCard);
-        assert(mockCardService.selectCard.withArgs(testCard).calledOnce, "card service select card not called with proper arg");
+        sinon.assert.calledWith(mockCardService.selectCard, testCard);
       });
 
       it('should deselect card if association fails', function() {
@@ -100,6 +100,20 @@ describe('Controller', function() {
         $scope.takeAction(testCard);
         $scope.takeAction(higherTestCard);
         expect(testCard.selected).to.be.false;
+      });
+
+      it('should select new card if association fails', function() {
+        higherTestCard.associate = function(){return false;};
+        $scope.takeAction(testCard);
+        $scope.takeAction(higherTestCard);
+        sinon.assert.calledWith(mockCardService.selectCard, higherTestCard);
+      });
+
+      it('should deselect all cards if association is successful', function() {
+        higherTestCard = _mockCard();
+        $scope.takeAction(testCard);
+        $scope.takeAction(higherTestCard);
+        sinon.assert.calledWith(mockCardService.clearSelected, testCard);
       });
     });
 
@@ -138,6 +152,7 @@ describe('Controller', function() {
       beforeEach(function() {
         higherCardToMove = _mockCard();
         cardToMove = _mockCard();
+        testCard = _mockCard();
         mockLaneService.laneContaining.withArgs(cardToMove).returns($scope.lanes[1]);
         mockLaneService.laneContaining.withArgs(testCard).returns($scope.lanes[0]);
         mockLaneService.laneContaining.withArgs(higherCardToMove).returns($scope.lanes[1]);

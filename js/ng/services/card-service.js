@@ -18,4 +18,9 @@ angular.module('services')
         card = card.associate();
       }
     }
+
+    this.clearSelected = function(card) {
+      _deselect = function(card) {card.selected = false;};
+      this.forEachAssociate(card, _deselect);
+    }
   }])

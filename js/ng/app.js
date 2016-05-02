@@ -9,19 +9,18 @@ angular.module('FreeCell', ['factories', 'services'])
         var cardAlreadySelected;
 
         function _moveToAssociate(card) {
-          if(card.associate(cardAlreadySelected)) {
-            addTo = laneService.laneContaining(card);
-            removeFrom = laneService.laneContaining(cardAlreadySelected);
-            while(!!cardAlreadySelected) {
-              addTo.push(cardAlreadySelected);
-              removeFrom.pop();
-              cardAlreadySelected = cardAlreadySelected.associate();
-            }
+          var tempCard = cardAlreadySelected,
+              addTo = laneService.laneContaining(card),
+              removeFrom = laneService.laneContaining(cardAlreadySelected);
+          while(!!tempCard) {
+            addTo.push(tempCard);
+            removeFrom.pop();
+            tempCard = tempCard.associate();
           }
         }
 
         function _isLegalMove(card) {
-          return cardAlreadySelected && !card.associate();
+          return cardAlreadySelected && !card.associate() && card.associate(cardAlreadySelected);
         }
 
         $scope.$watch('lanes', function(newValue, oldValue) {
@@ -30,9 +29,9 @@ angular.module('FreeCell', ['factories', 'services'])
 
         $scope.lanes = playArea.lanes;
         $scope.takeAction = function(card) {
-          //cardService.clearSelected();
           if (_isLegalMove(card)) {
             _moveToAssociate(card);
+            cardService.clearSelected(cardAlreadySelected);
             cardAlreadySelected = undefined;
           } else {
             cardAlreadySelected = card;
