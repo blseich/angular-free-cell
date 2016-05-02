@@ -17,10 +17,16 @@ angular.module('services')
         func(card);
         card = card.associate();
       }
-    }
+    };
 
     this.clearSelected = function(card) {
       _deselect = function(card) {card.selected = false;};
       this.forEachAssociate(card, _deselect);
-    }
+      selected = undefined;
+    };
+
+    this.selectedCard = function() {
+      return selected;
+    };
+
   }])

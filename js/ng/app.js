@@ -4,7 +4,8 @@ angular.module('FreeCell', ['factories', 'services'])
       'playArea',
       'cardService',
       'laneService',
-      function($scope, playArea, cardService, laneService) {
+      'movementService',
+      function($scope, playArea, cardService, laneService, movementService) {
 
         var cardAlreadySelected;
 

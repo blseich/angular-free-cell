@@ -102,4 +102,24 @@ describe('Card Service', function() {
     });
   });
 
+  describe('selected card', function() {
+    it('should return undefined if card is not already selected', function() {
+      expect(cardService.selectedCard()).to.be.undefined;
+    });
+
+    it('should return card if there is a currently selected card', function() {
+      var card = _mockCard();
+      cardService.selectCard(card);
+      expect(cardService.selectedCard()).to.equal(card);
+    });
+
+    it('should return undefined if card was selected then cleared', function() {
+      var card = _mockCard();
+      cardService.selectCard(card);
+      cardService.clearSelected(card);
+      expect(cardService.selectedCard()).to.be.undefined;
+    });
+
+  });
+
 });
