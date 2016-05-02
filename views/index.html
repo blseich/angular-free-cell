@@ -43,10 +43,7 @@
     <div class="main" ng-controller="FreeCellController">
       <!-- <div class="lanes"> -->
          <div class="lane" ng-repeat="lane in lanes">
-          <div class="card {{card.suit}} " ng-class='{selected : card.selected}' ng-repeat="card in lane" ng-click="takeAction(card)">
-            <p style="display: inline-block">{{card.val}}</p>
-            <p style="display: inline-block">{{card.suit}}</p>
-          </div>
+          <card ng-repeat="card in lane" suit="card.suit" value="card.val" selected="card.selected" ng-click="takeAction(card)"></card>
         </div>
       <!-- </div> -->
     </div>

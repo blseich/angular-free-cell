@@ -1,82 +1,38 @@
-angular.module('FreeCell', ['factories'])
+angular.module('FreeCell', ['factories', 'services'])
   .controller('FreeCellController', 
     [ '$scope',
       'playArea',
-      'indexFunctions',
-      function($scope, playArea, indexFunctions) {
-
-        var cardAlreadySelected;
-
-        function _getCardLane(card) {
-          var cardIndex, laneIndex;
-          laneIndex = $scope.lanes.findIndex(function(lane) {
-            return !!lane.find(function(checkCard) {
-              return checkCard === card;
-            });
-          });
-          return laneIndex;
-        }
-
-        function _moveToAssociate(card) {
-          if(card.associate(cardAlreadySelected)) {
-            addTo = $scope.lanes[_getCardLane(card)];
-            removeFrom = $scope.lanes[_getCardLane(cardAlreadySelected)];
-            while(!!cardAlreadySelected) {
-              addTo.push(cardAlreadySelected);
-              removeFrom.pop();
-              cardAlreadySelected = cardAlreadySelected.associate();
-            }
-          }
-        }
-
-        function _isLegalMove(card) {
-          return cardAlreadySelected && !card.associate();
-        }
-
-        function _isIllegalSelection(card) {
-          return !indexFunctions.isFirstInLane(card) && !card.associate();
-        }
+      'cardService',
+      'laneService',
+      'movementService',
+      function($scope, playArea, cardService, laneService, movementService) {
 
         $scope.$watch('lanes', function(newValue, oldValue) {
-          for (var i = 0; i < 8; i++) {
-            if (newValue[i].length > 0) {
-              newValue[i][newValue[i].length - 1].disassociate();
-            }
-            if(newValue[i].length > 1) {
-              var currentCard = newValue[i].length - 2,
-                cardToAssociate = newValue[i].length - 1;
-              while(!!newValue[i][currentCard] && newValue[i][currentCard].associate(newValue[i][cardToAssociate])) {
-                currentCard--;
-                cardToAssociate--;
-              }
-            }
-          }
+          laneService.autoAssociate(newValue);
         }, true);
-
+        
         $scope.lanes = playArea.lanes;
         $scope.takeAction = function(card) {
-          if(_isIllegalSelection(card)) {
-            return false;
-          }
-          _toggleSelected(cardAlreadySelected);
-          if (_isLegalMove(card)) {
-            _moveToAssociate(card);
-            cardAlreadySelected = undefined;
+          var previouslySelected = cardService.selectedCard();
+          if (movementService.isLegalMove(card) && card.associate(previouslySelected)) {
+            cardService.forEachAssociate(previouslySelected, movementService.moveToAssociate(card));
+            cardService.clearSelected(previouslySelected);
           } else {
-            cardAlreadySelected = card;
-            _toggleSelected(card);
+            cardService.selectCard(card);
           }
-          return true;
         };
-      }]);
+      }])
+  .directive('card', function($compile) {
 
+    return {
+      scope: {
+        value: '=value',
+        suit: '=suit',
+        selected: '=selected'
+      },
+      restrict: 'E',
+      templateUrl: 'card/card.html',
+      link: function(scope, el, attr) {}
+    }
 
-  
-function _toggleSelected(card, selected) {
-  var toggleCard = card;
-  while(toggleCard) {
-    toggleCard.selected = !toggleCard.selected;
-    toggleCard = toggleCard.associate();
-  }
-}
-
+  });
