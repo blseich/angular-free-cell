@@ -46,7 +46,8 @@ describe('Lane Service', function() {
 
     var _mockCard = function() {
       return {
-        associate: sinon.stub().returns(true)
+        associate: sinon.stub().returns(true),
+        disassociate: sinon.spy()
       };
     };
 
@@ -56,9 +57,15 @@ describe('Lane Service', function() {
       sinon.assert.notCalled(lanes[0][0].associate);
     });
 
+    it('should remove any association on first card in lane', function() {
+      lanes[0] = [_mockCard(), _mockCard(), _mockCard()];
+      laneService.autoAssociate(lanes);
+      sinon.assert.called(lanes[0][2].disassociate);
+    });
+
     it('should attempt association on all valid lanes', function() {
       for (var i = 0; i < 8; i++) {
-        lanes[i] = [_mockCard(), _mockCard];
+        lanes[i] = [_mockCard(), _mockCard()];
       }
       laneService.autoAssociate(lanes);
       for(var i = 0; i < 8; i++) {

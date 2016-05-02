@@ -23,6 +23,9 @@ angular.module('services')
         var cardsLeftInLane = lane.length,
             card = lane[cardsLeftInLane - 1],
             nextCard = lane[cardsLeftInLane - 2];
+        if(!!card) {
+          card.disassociate();
+        }
         while (cardsLeftInLane > 1 && nextCard.associate(card)) {
           cardsLeftInLane--;
           card = nextCard;
