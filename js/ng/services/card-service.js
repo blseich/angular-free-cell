@@ -2,10 +2,9 @@ angular.module('services')
   .service('cardService', ['laneService', function(laneService) {
     var selected;
     this.selectCard = function(newCard) {
-      _deselect = function(card) {card.selected = false;};
       _select = function(card) {card.selected = true;};
+      this.clearSelected(selected);
       if (laneService.isFirstInLane(newCard) || newCard.associate()) {
-        this.forEachAssociate(selected, _deselect);
         this.forEachAssociate(newCard, _select);
         selected = newCard;
       }

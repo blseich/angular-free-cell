@@ -7,11 +7,13 @@ describe('Movement Service', function() {
       m_card;
 
   m_cardService = {
-    selectedCard: sinon.stub()
+    selectedCard: sinon.stub(),
+    forEachAssociate: sinon.stub()
   }
 
   m_laneService = {
-    isFirstInLane: sinon.stub()
+    isFirstInLane: sinon.stub(),
+    laneContaining: sinon.stub()
   }
 
   _mockCard = function(){
@@ -28,6 +30,7 @@ describe('Movement Service', function() {
     });
     $provide.service('laneService', function() {
       this.isFirstInLane = m_laneService.isFirstInLane;
+      this.laneContaining = m_laneService.laneContaining;
     });
   }));
   
@@ -59,22 +62,48 @@ describe('Movement Service', function() {
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.false;
     });
 
-    it('should return false if passed card doesn\'t have associates and there is a card selected but association fails', function() {
-      expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.false;
-    });
-
-    it('should check for associates before attempting to associate', function() {
-      movementService.isLegalMove(m_cardToAssociateWith);
-      sinon.assert.callOrder(m_cardToAssociateWith.associate.withArgs(), m_cardToAssociateWith.associate.withArgs(m_card));
-    });
-
     it('should return true if card is selected and passed card does not have associates passed card is first in lane and association succeeds', function() {
-      m_cardToAssociateWith.associate.onFirstCall().returns(false);
-      m_cardToAssociateWith.associate.onSecondCall().returns(true);
+      m_cardToAssociateWith.associate.returns(false);
       m_laneService.isFirstInLane.returns(true);
       m_cardService.selectedCard.returns(m_card);
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.true;
     });
 
   });
+
+  describe('move to associate', function() {
+    var m_removalLane, m_additionLane;
+
+    beforeEach(function() {
+      m_removalLane = [m_card];
+      m_additionLane = [m_cardToAssociateWith];
+      m_cardService.selectedCard.returns(m_card);
+      m_laneService.laneContaining.withArgs(m_card).returns(m_removalLane);
+      m_laneService.laneContaining.withArgs(m_cardToAssociateWith).returns(m_additionLane);
+    });
+
+    it('should return a function', function() {
+      expect(typeof movementService.moveToAssociate(m_cardToAssociateWith)).to.equal('function');
+    });
+
+    describe('returned function', function(){
+      var returnedFunction;
+      
+      beforeEach(function() {
+        returnedFunction = movementService.moveToAssociate(m_cardToAssociateWith);
+      });
+
+      it('should remove previoulsy selected card from its current lane', function() {
+        returnedFunction(m_card);
+        expect(m_removalLane[0]).to.be.undefined;
+      });
+
+      it('should add previously selected card to new lane', function() {
+        returnedFunction(m_card);
+        expect(m_additionLane[1]).to.equal(m_card);
+      });
+    });
+
+  });
+
 });

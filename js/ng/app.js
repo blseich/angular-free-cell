@@ -7,38 +7,19 @@ angular.module('FreeCell', ['factories', 'services'])
       'movementService',
       function($scope, playArea, cardService, laneService, movementService) {
 
-        var cardAlreadySelected;
-
-        function _moveToAssociate(card) {
-          var tempCard = cardAlreadySelected,
-              addTo = laneService.laneContaining(card),
-              removeFrom = laneService.laneContaining(cardAlreadySelected);
-          while(!!tempCard) {
-            addTo.push(tempCard);
-            removeFrom.pop();
-            tempCard = tempCard.associate();
-          }
-        }
-
-        function _isLegalMove(card) {
-          return cardAlreadySelected && !card.associate() && card.associate(cardAlreadySelected);
-        }
-
         $scope.$watch('lanes', function(newValue, oldValue) {
           laneService.autoAssociate(newValue);
         }, true);
 
         $scope.lanes = playArea.lanes;
         $scope.takeAction = function(card) {
-          if (_isLegalMove(card)) {
-            _moveToAssociate(card);
-            cardService.clearSelected(cardAlreadySelected);
-            cardAlreadySelected = undefined;
+          var previouslySelected = cardService.selectedCard();
+          if (movementService.isLegalMove(card) && card.associate(previouslySelected)) {
+            cardService.forEachAssociate(previouslySelected, movementService.moveToAssociate(card));
+            cardService.clearSelected(previouslySelected);
           } else {
-            cardAlreadySelected = card;
             cardService.selectCard(card);
           }
-          return true;
         };
       }])
   .directive('card', function($compile) {
@@ -48,26 +29,10 @@ angular.module('FreeCell', ['factories', 'services'])
         value: '=value',
         suit: '=suit',
         selected: '=selected'
-        //action: '&ngClick'
       },
       restrict: 'E',
       templateUrl: 'card/card.html',
-      link: function(scope, el, attr) {
-        // el.bind('click', function() {
-        //   scope.action();
-        // });
-      }
+      link: function(scope, el, attr) {}
     }
 
   });
-
-
-  
-function _toggleSelected(card) {
-  var toggleCard = card;
-  while(toggleCard) {
-    toggleCard.selected = !toggleCard.selected;
-    toggleCard = toggleCard.associate();
-  }
-}
-
