@@ -1,20 +1,10 @@
 describe('Movement Service', function() {
   var movementService,
-      m_cardService,
-      m_laneService,
+      cardService,
+      laneService,
       _mockCard,
       m_cardToAssociateWith,
       m_card;
-
-  m_cardService = {
-    selectedCard: sinon.stub(),
-    forEachAssociate: sinon.stub()
-  }
-
-  m_laneService = {
-    isFirstInLane: sinon.stub(),
-    laneContaining: sinon.stub()
-  }
 
   _mockCard = function(){
     return {
@@ -26,34 +16,36 @@ describe('Movement Service', function() {
 
   beforeEach(module(function($provide) {
     $provide.service('cardService', function() {
-      this.selectedCard = m_cardService.selectedCard;
+      this.selectedCard = sinon.stub();
     });
     $provide.service('laneService', function() {
-      this.isFirstInLane = m_laneService.isFirstInLane;
-      this.laneContaining = m_laneService.laneContaining;
+      this.isFirstInLane = sinon.stub();
+      this.laneContaining = sinon.stub();
     });
   }));
   
-  beforeEach(inject(function(_movementService_) {
+  beforeEach(inject(function(_movementService_, _cardService_, _laneService_) {
     movementService = _movementService_;
+    cardService = _cardService_;
+    laneService = _laneService_;
   }));
 
   beforeEach(function() {
     m_card = _mockCard();
     m_cardToAssociateWith = _mockCard();
     m_cardToAssociateWith.associate.returns(false);
-    m_laneService.isFirstInLane.returns(true);
-    m_cardService.selectedCard.returns(m_card);
+    laneService.isFirstInLane.returns(true);
+    cardService.selectedCard.returns(m_card);
   });
 
   describe('legal move', function() {
     it('should return false if a card is not already selected', function() {
-      m_cardService.selectedCard.returns(undefined);
+      cardService.selectedCard.returns(undefined);
       expect(movementService.isLegalMove(m_card)).to.be.false;
     });
 
     it('should return false if passed card is not first in the lane', function() {
-      m_laneService.isFirstInLane.returns(false);
+      laneService.isFirstInLane.returns(false);
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.false;
     });
 
@@ -64,8 +56,8 @@ describe('Movement Service', function() {
 
     it('should return true if card is selected and passed card does not have associates passed card is first in lane and association succeeds', function() {
       m_cardToAssociateWith.associate.returns(false);
-      m_laneService.isFirstInLane.returns(true);
-      m_cardService.selectedCard.returns(m_card);
+      laneService.isFirstInLane.returns(true);
+      cardService.selectedCard.returns(m_card);
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.true;
     });
 
@@ -77,9 +69,9 @@ describe('Movement Service', function() {
     beforeEach(function() {
       m_removalLane = [m_card];
       m_additionLane = [m_cardToAssociateWith];
-      m_cardService.selectedCard.returns(m_card);
-      m_laneService.laneContaining.withArgs(m_card).returns(m_removalLane);
-      m_laneService.laneContaining.withArgs(m_cardToAssociateWith).returns(m_additionLane);
+      cardService.selectedCard.returns(m_card);
+      laneService.laneContaining.withArgs(m_card).returns(m_removalLane);
+      laneService.laneContaining.withArgs(m_cardToAssociateWith).returns(m_additionLane);
     });
 
     it('should return a function', function() {

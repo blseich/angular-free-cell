@@ -44,7 +44,7 @@ describe('Factories', function() {
     }));
 
     it ('should shuffle deck', inject(function(playArea) {
-      expect(mockDeck.shuffle.calledOnce).to.equal(true);
+      sinon.assert.calledOnce(mockDeck.shuffle);
     }));
 
     it ('should deal 7 cards to the first four lanes', inject(function(playArea) {

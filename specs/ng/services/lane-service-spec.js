@@ -67,21 +67,21 @@ describe('Lane Service', function() {
     });
 
     it('should call associate on proper card of lane', function() {
-      var firstCard = _mockCard();
-          secondCard = _mockCard();
-      lanes[0] = [secondCard, firstCard];
+      var m_firstCard = _mockCard();
+          m_secondCard = _mockCard();
+      lanes[0] = [m_secondCard, m_firstCard];
       laneService.autoAssociate(lanes);
-      sinon.assert.calledWith(secondCard.associate, firstCard);
+      sinon.assert.calledWith(m_secondCard.associate, m_firstCard);
     });
 
     it('should attempt successive associations if successful', function() {        
-        var testCard = _mockCard(),
-            higherTestCard = _mockCard(),
-            highestTestCard = _mockCard();
-        lanes[0] = [highestTestCard, higherTestCard, testCard];
+        var m_testCard = _mockCard(),
+            m_secondAssociateCard = _mockCard(),
+            m_thirdAssociateCard = _mockCard();
+        lanes[0] = [m_thirdAssociateCard, m_secondAssociateCard, m_testCard];
         laneService.autoAssociate(lanes);
-        sinon.assert.calledOnce(highestTestCard.associate);
-        sinon.assert.calledWith(highestTestCard.associate, higherTestCard);
+        sinon.assert.calledOnce(m_thirdAssociateCard.associate);
+        sinon.assert.calledWith(m_thirdAssociateCard.associate, m_secondAssociateCard);
       });
 
   });

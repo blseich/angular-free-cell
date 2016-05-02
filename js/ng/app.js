@@ -10,7 +10,7 @@ angular.module('FreeCell', ['factories', 'services'])
         $scope.$watch('lanes', function(newValue, oldValue) {
           laneService.autoAssociate(newValue);
         }, true);
-
+        
         $scope.lanes = playArea.lanes;
         $scope.takeAction = function(card) {
           var previouslySelected = cardService.selectedCard();
