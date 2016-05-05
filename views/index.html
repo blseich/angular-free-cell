@@ -17,6 +17,14 @@
         display: inline-block;
       }
 
+      .free-cell {
+        height: 89px;
+        width: 65px;
+        border: green solid 2px;
+        border-radius: 3px;
+        padding: 5px;
+      }
+
       .D, .H {
         color: red;
       }
@@ -42,6 +50,13 @@
 
     <div class="main" ng-controller="FreeCellController">
       <!-- <div class="lanes"> -->
+         <div class="top">
+          <div class="free-cells">
+            <div class="free-cell" ng-repeat="cell in freeCells" ng-click="freeCellAction(cell)">
+              <card ng-repeat="card in cell" suit="card.suit" value="card.val" selected="card.selected" ng-click="takeAction(card)"></card>
+            </div>
+          </div>
+         </div>
          <div class="lane" ng-repeat="lane in lanes">
           <card ng-repeat="card in lane" suit="card.suit" value="card.val" selected="card.selected" ng-click="takeAction(card)"></card>
         </div>

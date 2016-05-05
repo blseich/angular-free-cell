@@ -36,89 +36,138 @@ describe('Controller', function() {
       m_cardToAssociateWith = {associate: sinon.stub()};
     }));
 
-    describe('Card Selection/Deselection', function() {
-      it('should select card', function() {
-        $scope.takeAction(m_card);
-        sinon.assert.calledWith(cardService.selectCard, m_card);
+    describe('Card Actions', function(){
+      describe('Card Selection/Deselection', function() {
+        it('should select card', function() {
+          $scope.takeAction(m_card);
+          sinon.assert.calledWith(cardService.selectCard, m_card);
+        });
+
+        it('should select new card if association fails', function() {
+          m_cardToAssociateWith.associate.returns(false);
+          $scope.takeAction(m_cardToAssociateWith);
+          sinon.assert.calledWith(cardService.selectCard, m_cardToAssociateWith);
+        });
+
+        it('should deselect all cards if association is successful', function() {
+          movementService.isLegalMove.withArgs(m_card).returns(false);
+          movementService.isLegalMove.withArgs(m_cardToAssociateWith).returns(true);
+          cardService.selectedCard.returns(m_card);
+          m_cardToAssociateWith.associate.returns(true);
+          $scope.takeAction(m_card);
+          $scope.takeAction(m_cardToAssociateWith);
+          sinon.assert.calledWith(cardService.clearSelected, m_card);
+        });
       });
 
-      it('should select new card if association fails', function() {
-        m_cardToAssociateWith.associate.returns(false);
-        $scope.takeAction(m_cardToAssociateWith);
-        sinon.assert.calledWith(cardService.selectCard, m_cardToAssociateWith);
+      describe('Auto Associations', function() {
+        it('should auto associate when lanes have changed', function() {
+          $scope.$digest();
+          sinon.assert.calledOnce(laneService.autoAssociate);
+        });
       });
 
-      it('should deselect all cards if association is successful', function() {
-        movementService.isLegalMove.withArgs(m_card).returns(false);
-        movementService.isLegalMove.withArgs(m_cardToAssociateWith).returns(true);
-        cardService.selectedCard.returns(m_card);
-        m_cardToAssociateWith.associate.returns(true);
-        $scope.takeAction(m_card);
-        $scope.takeAction(m_cardToAssociateWith);
-        sinon.assert.calledWith(cardService.clearSelected, m_card);
+      describe('Card Movement', function() {
+        it('should see if move is legal', function() {
+          $scope.takeAction(m_card);
+          sinon.assert.calledWith(movementService.isLegalMove, m_card);
+        });
+
+        describe('move is legal', function() {
+
+          beforeEach(function() {
+            movementService.isLegalMove.returns(true);
+          });
+
+          it('should check for association after checking for legal move', function() {
+            movementService.isLegalMove.returns(true);
+            $scope.takeAction(m_card);
+            sinon.assert.callOrder(movementService.isLegalMove, m_card.associate);
+          });
+
+          describe('association fails', function() {
+
+            it('should not setup lanes for movement', function() {
+              m_card.associate.returns(false);
+              $scope.takeAction(m_card);
+              sinon.assert.notCalled(movementService.moveToAssociate);
+            });
+
+          });
+
+          describe('association succeeds', function() {
+            beforeEach(function() {
+              m_card.associate.returns(true);
+            });
+
+            it('should setup lanes for movement', function() {
+              $scope.takeAction(m_card);
+              sinon.assert.calledWith(movementService.moveToAssociate, m_card);
+            });
+
+            it('should moveToAssociate for each associate of selected card', function() {
+              var moveFunction = function(){},
+                  m_previouslySelectedCard = {};
+              cardService.selectedCard.returns(m_previouslySelectedCard);
+              movementService.moveToAssociate.returns(moveFunction);
+              $scope.takeAction(m_card);
+              sinon.assert.calledWith(cardService.forEachAssociate, m_previouslySelectedCard, moveFunction);
+            });
+
+            it('should clear selected cards', function() {
+              $scope.takeAction(m_card);
+              sinon.assert.calledOnce(cardService.clearSelected);
+            });
+          });
+        });
       });
+
     });
 
-    describe('Auto Associations', function() {
-      it('should auto associate when lanes have changed', function() {
-        $scope.$digest();
-        sinon.assert.calledOnce(laneService.autoAssociate);
-      });
-    });
-
-    describe('Card Movement', function() {
-      it('should see if move is legal', function() {
-        $scope.takeAction(m_card);
-        sinon.assert.calledWith(movementService.isLegalMove, m_card);
-      });
-
-      describe('move is legal', function() {
+    describe('Free Cell Actions', function() {
+      
+      describe('cell unoccupied', function() {
+        var cell, m_card;
 
         beforeEach(function() {
-          movementService.isLegalMove.returns(true);
+          cell = [];
+          m_card = {};
+          cardService.selectedCard.returns(m_card);
         });
 
-        it('should check for association after checking for legal move', function() {
-          movementService.isLegalMove.returns(true);
-          $scope.takeAction(m_card);
-          sinon.assert.callOrder(movementService.isLegalMove, m_card.associate);
+        it('should move previously selected card to selected free cell', function() {
+          sinon.spy(cell, 'push');
+          $scope.freeCellAction(cell);
+          sinon.assert.calledWith(cell.push, m_card);
         });
 
-        describe('association fails', function() {
-
-          it('should not setup lanes for movement', function() {
-            m_card.associate.returns(false);
-            $scope.takeAction(m_card);
-            sinon.assert.notCalled(movementService.moveToAssociate);
-          });
-
+        it('should clear selected after occupying a free cell', function() {
+          $scope.freeCellAction(cell);
+          sinon.assert.calledWith(cardService.clearSelected, m_card);
         });
 
-        describe('association succeeds', function() {
-          beforeEach(function() {
-            m_card.associate.returns(true);
-          });
-
-          it('should setup lanes for movement', function() {
-            $scope.takeAction(m_card);
-            sinon.assert.calledWith(movementService.moveToAssociate, m_card);
-          });
-
-          it('should moveToAssociate for each associate of selected card', function() {
-            var moveFunction = function(){},
-                m_previouslySelectedCard = {};
-            cardService.selectedCard.returns(m_previouslySelectedCard);
-            movementService.moveToAssociate.returns(moveFunction);
-            $scope.takeAction(m_card);
-            sinon.assert.calledWith(cardService.forEachAssociate, m_previouslySelectedCard, moveFunction);
-          });
-
-          it('should clear selected cards', function() {
-            $scope.takeAction(m_card);
-            sinon.assert.calledOnce(cardService.clearSelected);
-          });
+        it('should remove previously selected card from it\'s lane', function() {
+          var removeFrom = [m_card];
+          sinon.spy(removeFrom, 'pop');
+          laneService.laneContaining.withArgs(m_card).returns(removeFrom);
+          $scope.freeCellAction(cell);
+          sinon.assert.calledOnce(removeFrom.pop);
         });
       });
+
+      describe('cell occupied', function() {
+        
+        it('should not attempt to add another card', function() {
+          var m_card = {},
+              cell = [cell];
+          sinon.spy(cell, 'push');
+          $scope.freeCellAction(cell);
+          sinon.assert.notCalled(cell.push);
+         });
+
+        
+      });
+
 
 
     });
