@@ -1,7 +1,7 @@
 describe('Controller', function() {
   var $scope,
       $controller,
-      cardService, locationService, upkeepService, movementService,
+      cardService, upkeepService, movementService,
       m_card, m_cardToAssociateWith;
 
   beforeEach(module('FreeCell'));
@@ -13,9 +13,6 @@ describe('Controller', function() {
       this.selectedCard = sinon.stub();
       this.forEachAssociate = sinon.spy();
     });
-    $provide.service('locationService', function() {
-      this.laneContaining = sinon.stub().returns([]);
-    });
     $provide.service('upkeepService', function() {
       this.autoAssociate = sinon.spy();
       this.emptyLaneCleanup = sinon.spy();
@@ -26,12 +23,11 @@ describe('Controller', function() {
     });
   }));
 
-  beforeEach(inject(function($rootScope, _$controller_, _cardService_, _locationService_, _movementService_, _upkeepService_){
+  beforeEach(inject(function($rootScope, _$controller_, _cardService_, _movementService_, _upkeepService_){
     // The injector unwraps the underscores (_) from around the parameter names when matching
     $controller = _$controller_;
     $scope = $rootScope.$new();
     cardService = _cardService_;
-    locationService = _locationService_;
     movementService = _movementService_;
     upkeepService = _upkeepService_;
     $controller('FreeCellController', {$scope: $scope});

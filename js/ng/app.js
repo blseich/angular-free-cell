@@ -3,10 +3,9 @@ angular.module('FreeCell', ['factories', 'services'])
     [ '$scope',
       'playArea',
       'cardService',
-      'locationService',
       'movementService',
       'upkeepService',
-      function($scope, playArea, cardService, locationService, movementService, upkeepService) {
+      function($scope, playArea, cardService, movementService, upkeepService) {
 
         $scope.$watch('lanes', function(newValue, oldValue) {
           upkeepService.autoAssociate(newValue);
