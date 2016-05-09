@@ -1,5 +1,5 @@
 describe('Card Service', function() {
-  var cardService, laneService;
+  var cardService, locationService;
 
   function _mockCard(associate) {
     return {
@@ -9,15 +9,15 @@ describe('Card Service', function() {
     }
   };
 
-  laneService = {
-    isFirstInLane: sinon.stub()
+  locationService = {
+    isSelectable: sinon.stub()
   };
 
   beforeEach(module('services'));
 
   beforeEach(module(function($provide) {
-    $provide.service('laneService', function() {
-      this.isFirstInLane = laneService.isFirstInLane;
+    $provide.service('locationService', function() {
+      this.isSelectable = locationService.isSelectable;
     });
   }));
 
@@ -28,7 +28,7 @@ describe('Card Service', function() {
   describe('selection', function() {
     var m_card, m_cardWithAssociate,
         m_preselectedCard, m_preselectedCardWithAssociate,
-        isFirstInLaneStub;
+        isSelectableStub;
 
     
     beforeEach(function() {
@@ -36,17 +36,17 @@ describe('Card Service', function() {
       m_preselectedCard = _mockCard();
       m_cardWithAssociate = _mockCard(m_card);
       m_preselectedCardWithAssociate = _mockCard(m_preselectedCard);
-      laneService.isFirstInLane.returns(true);
+      locationService.isSelectable.returns(true);
     });
 
     it('should not select card if not first in lane and has no associates', function() {
-      laneService.isFirstInLane.returns(false);
+      locationService.isSelectable.returns(false);
       cardService.selectCard(m_card);
       expect(m_card.selected).to.be.falsey;
     });
 
     it('should select card if not first in lane but has card has associates', function() {
-      laneService.isFirstInLane.returns(false);
+      locationService.isSelectable.returns(false);
       cardService.selectCard(m_cardWithAssociate);
       expect(m_cardWithAssociate.selected).to.be.true;
     });

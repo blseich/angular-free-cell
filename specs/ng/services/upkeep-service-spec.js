@@ -1,46 +1,11 @@
-describe('Lane Service', function() {
-  var laneService, lanes;
+describe('Upkeep Service', function() {
+  var upkeepService,
+      lanes = [];
 
   beforeEach(module('services'));
-
-  beforeEach(module(function($provide) {
-    lanes = [[],[],[],[],[],[],[],[]];
-    $provide.service('playArea', function() {
-      return {
-        lanes: lanes
-      }
-    });
+  beforeEach(inject(function(_upkeepService_){
+    upkeepService = _upkeepService_;
   }));
-
-  beforeEach(inject(function(_laneService_) {
-    laneService = _laneService_;
-  }));
-
-  describe('is first in lane', function() {
-    
-    it('should return true if card is first in lane', function() {
-      var card = {};
-      lanes[0] = [card];
-      expect(laneService.isFirstInLane(card)).to.be.true;
-    });
-
-    it('should not return true if card is not first in lane', function() {
-      var notFirst = {},
-          actuallyFirst = {};
-      lanes[1] = [notFirst, actuallyFirst];
-      expect(laneService.isFirstInLane(notFirst)).to.be.false;
-    });
-  });
-
-  describe('lane containing', function() {
-
-    it('should return lane that contains given card', function() {
-      var findCard = {};
-      lanes[2] = [findCard];
-      expect(laneService.laneContaining(findCard)).to.equal(lanes[2]);
-    });
-
-  });
 
   describe('auto association', function() {
 
@@ -53,13 +18,13 @@ describe('Lane Service', function() {
 
     it('should not attempt association on lane with only one card', function() {
       lanes[0] = [_mockCard()];
-      laneService.autoAssociate(lanes);
+      upkeepService.autoAssociate(lanes);
       sinon.assert.notCalled(lanes[0][0].associate);
     });
 
     it('should remove any association on first card in lane', function() {
       lanes[0] = [_mockCard(), _mockCard(), _mockCard()];
-      laneService.autoAssociate(lanes);
+      upkeepService.autoAssociate(lanes);
       sinon.assert.called(lanes[0][2].disassociate);
     });
 
@@ -67,7 +32,7 @@ describe('Lane Service', function() {
       for (var i = 0; i < 8; i++) {
         lanes[i] = [_mockCard(), _mockCard()];
       }
-      laneService.autoAssociate(lanes);
+      upkeepService.autoAssociate(lanes);
       for(var i = 0; i < 8; i++) {
         sinon.assert.called(lanes[i][0].associate);
       }
@@ -77,7 +42,7 @@ describe('Lane Service', function() {
       var m_firstCard = _mockCard();
           m_secondCard = _mockCard();
       lanes[0] = [m_secondCard, m_firstCard];
-      laneService.autoAssociate(lanes);
+      upkeepService.autoAssociate(lanes);
       sinon.assert.calledWith(m_secondCard.associate, m_firstCard);
     });
 
@@ -86,11 +51,40 @@ describe('Lane Service', function() {
             m_secondAssociateCard = _mockCard(),
             m_thirdAssociateCard = _mockCard();
         lanes[0] = [m_thirdAssociateCard, m_secondAssociateCard, m_testCard];
-        laneService.autoAssociate(lanes);
+        upkeepService.autoAssociate(lanes);
         sinon.assert.calledOnce(m_thirdAssociateCard.associate);
         sinon.assert.calledWith(m_thirdAssociateCard.associate, m_secondAssociateCard);
-      });
+    });
 
+  });
+
+  describe('Empty Lane Cleanup', function() {
+    var nullCard = {
+          suit: '',
+          value: '',
+          isNull: true
+        },
+        nonNullCard = {};
+
+    sinon.stub(Card, 'NULL_CARD').returns(nullCard);
+
+    it('should add a \'null\' card to any empty lane', function() {
+      lanes[0] = [];
+      upkeepService.emptyLaneCleanup(lanes);
+      expect(lanes[0][0]).to.equal(nullCard);
+    });
+
+    it('should not remove null card if another card is not present', function() {
+      lanes[0] = [nullCard];
+      upkeepService.emptyLaneCleanup(lanes);
+      expect(lanes[0][0]).to.equal(nullCard);
+    });
+
+    it('should remove \'null\' card from any lane that now contains cards', function() {
+      lanes[0] = [nullCard, nonNullCard];
+      upkeepService.emptyLaneCleanup(lanes);
+      expect(lanes[0][0]).to.equal(nonNullCard);
+    });
   });
 
 });

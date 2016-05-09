@@ -3,19 +3,28 @@ angular.module('FreeCell', ['factories', 'services'])
     [ '$scope',
       'playArea',
       'cardService',
-      'laneService',
+      'locationService',
       'movementService',
-      function($scope, playArea, cardService, laneService, movementService) {
+      'upkeepService',
+      function($scope, playArea, cardService, locationService, movementService, upkeepService) {
 
         $scope.$watch('lanes', function(newValue, oldValue) {
-          laneService.autoAssociate(newValue);
+          upkeepService.autoAssociate(newValue);
+          upkeepService.emptyLaneCleanup(newValue);
         }, true);
+
+        $scope.$watch('freeCells', function(newValue, oldValue) {
+          upkeepService.emptyLaneCleanup(newValue);
+        }, true);
+
+
         
         $scope.lanes = playArea.lanes;
         $scope.freeCells = playArea.freeCells;
 
         $scope.takeAction = function(card) {
           var previouslySelected = cardService.selectedCard();
+          
           if (movementService.isLegalMove(card) && card.associate(previouslySelected)) {
             cardService.forEachAssociate(previouslySelected, movementService.moveToAssociate(card));
             cardService.clearSelected(previouslySelected);
@@ -24,14 +33,13 @@ angular.module('FreeCell', ['factories', 'services'])
           }
         };
 
-        $scope.freeCellAction = function(cell) {
-          if(cell.length === 0) {
-            var  previouslySelected = cardService.selectedCard();
-            cell.push(previouslySelected);
-            cardService.clearSelected(previouslySelected);
-            laneService.laneContaining(previouslySelected).pop();
-          } else {
-            $scope.takeAction(cell.pop());
+        $scope.freeCellAction = function(card) {
+          var previouslySelectedCard = cardService.selectedCard();
+          if(card.isNull && !!previouslySelectedCard && !previouslySelectedCard.associate()) {
+            cardService.forEachAssociate(previouslySelectedCard, movementService.moveToAssociate(card));
+            cardService.clearSelected(previouslySelectedCard);
+          } else if(!card.isNull) {
+            cardService.selectCard(card);
           }
         };
 

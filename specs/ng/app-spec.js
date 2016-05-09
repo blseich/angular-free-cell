@@ -1,174 +1,220 @@
 describe('Controller', function() {
-    var $scope,
-        $controller,
-        m_card, m_cardToAssociateWith;
+  var $scope,
+      $controller,
+      cardService, locationService, upkeepService, movementService,
+      m_card, m_cardToAssociateWith;
 
-    beforeEach(module('FreeCell'));
+  beforeEach(module('FreeCell'));
 
-    beforeEach(module(function($provide) {
-      $provide.service('cardService', function() {
-        this.selectCard = sinon.stub();
-        this.clearSelected = sinon.spy();
-        this.selectedCard = sinon.stub();
-        this.forEachAssociate = sinon.spy();
+  beforeEach(module(function($provide) {
+    $provide.service('cardService', function() {
+      this.selectCard = sinon.stub();
+      this.clearSelected = sinon.spy();
+      this.selectedCard = sinon.stub();
+      this.forEachAssociate = sinon.spy();
+    });
+    $provide.service('locationService', function() {
+      this.laneContaining = sinon.stub().returns([]);
+    });
+    $provide.service('upkeepService', function() {
+      this.autoAssociate = sinon.spy();
+      this.emptyLaneCleanup = sinon.spy();
+    });
+    $provide.service('movementService', function() {
+      this.isLegalMove = sinon.stub();
+      this.moveToAssociate = sinon.stub();
+    });
+  }));
+
+  beforeEach(inject(function($rootScope, _$controller_, _cardService_, _locationService_, _movementService_, _upkeepService_){
+    // The injector unwraps the underscores (_) from around the parameter names when matching
+    $controller = _$controller_;
+    $scope = $rootScope.$new();
+    cardService = _cardService_;
+    locationService = _locationService_;
+    movementService = _movementService_;
+    upkeepService = _upkeepService_;
+    $controller('FreeCellController', {$scope: $scope});
+
+    //setup stubbed objects
+    m_card = {associate: sinon.stub()};
+    m_cardToAssociateWith = {associate: sinon.stub()};
+  }));
+
+  describe('Card Actions', function(){
+    describe('Card Selection/Deselection', function() {
+      it('should select card', function() {
+        $scope.takeAction(m_card);
+        sinon.assert.calledWith(cardService.selectCard, m_card);
       });
-      $provide.service('laneService', function() {
-        this.laneContaining = sinon.stub().returns([]);
-        this.autoAssociate = sinon.spy();
+
+      it('should select new card if association fails', function() {
+        m_cardToAssociateWith.associate.returns(false);
+        $scope.takeAction(m_cardToAssociateWith);
+        sinon.assert.calledWith(cardService.selectCard, m_cardToAssociateWith);
       });
-      $provide.service('movementService', function() {
-        this.isLegalMove = sinon.stub();
-        this.moveToAssociate = sinon.stub();
+
+      it('should deselect all cards if association is successful', function() {
+        movementService.isLegalMove.withArgs(m_card).returns(false);
+        movementService.isLegalMove.withArgs(m_cardToAssociateWith).returns(true);
+        cardService.selectedCard.returns(m_card);
+        m_cardToAssociateWith.associate.returns(true);
+        $scope.takeAction(m_card);
+        $scope.takeAction(m_cardToAssociateWith);
+        sinon.assert.calledWith(cardService.clearSelected, m_card);
       });
-    }));
+    });
 
-    beforeEach(inject(function($rootScope, _$controller_, _cardService_, _laneService_, _movementService_){
-      // The injector unwraps the underscores (_) from around the parameter names when matching
-      $controller = _$controller_;
-      $scope = $rootScope.$new();
-      cardService = _cardService_;
-      laneService = _laneService_;
-      movementService = _movementService_;
-      $controller('FreeCellController', {$scope: $scope});
+    describe('Card Movement', function() {
+      it('should see if move is legal', function() {
+        $scope.takeAction(m_card);
+        sinon.assert.calledWith(movementService.isLegalMove, m_card);
+      });
 
-      //setup stubbed objects
-      m_card = {associate: sinon.stub()};
-      m_cardToAssociateWith = {associate: sinon.stub()};
-    }));
+      describe('move is legal', function() {
 
-    describe('Card Actions', function(){
-      describe('Card Selection/Deselection', function() {
-        it('should select card', function() {
+        beforeEach(function() {
+          movementService.isLegalMove.returns(true);
+        });
+
+        it('should check for association after checking for legal move', function() {
+          movementService.isLegalMove.returns(true);
           $scope.takeAction(m_card);
-          sinon.assert.calledWith(cardService.selectCard, m_card);
+          sinon.assert.callOrder(movementService.isLegalMove, m_card.associate);
         });
 
-        it('should select new card if association fails', function() {
-          m_cardToAssociateWith.associate.returns(false);
-          $scope.takeAction(m_cardToAssociateWith);
-          sinon.assert.calledWith(cardService.selectCard, m_cardToAssociateWith);
-        });
+        describe('association fails', function() {
 
-        it('should deselect all cards if association is successful', function() {
-          movementService.isLegalMove.withArgs(m_card).returns(false);
-          movementService.isLegalMove.withArgs(m_cardToAssociateWith).returns(true);
-          cardService.selectedCard.returns(m_card);
-          m_cardToAssociateWith.associate.returns(true);
-          $scope.takeAction(m_card);
-          $scope.takeAction(m_cardToAssociateWith);
-          sinon.assert.calledWith(cardService.clearSelected, m_card);
-        });
-      });
-
-      describe('Auto Associations', function() {
-        it('should auto associate when lanes have changed', function() {
-          $scope.$digest();
-          sinon.assert.calledOnce(laneService.autoAssociate);
-        });
-      });
-
-      describe('Card Movement', function() {
-        it('should see if move is legal', function() {
-          $scope.takeAction(m_card);
-          sinon.assert.calledWith(movementService.isLegalMove, m_card);
-        });
-
-        describe('move is legal', function() {
-
-          beforeEach(function() {
-            movementService.isLegalMove.returns(true);
-          });
-
-          it('should check for association after checking for legal move', function() {
-            movementService.isLegalMove.returns(true);
+          it('should not setup lanes for movement', function() {
+            m_card.associate.returns(false);
             $scope.takeAction(m_card);
-            sinon.assert.callOrder(movementService.isLegalMove, m_card.associate);
+            sinon.assert.notCalled(movementService.moveToAssociate);
           });
 
-          describe('association fails', function() {
+        });
 
-            it('should not setup lanes for movement', function() {
-              m_card.associate.returns(false);
-              $scope.takeAction(m_card);
-              sinon.assert.notCalled(movementService.moveToAssociate);
-            });
-
+        describe('association succeeds', function() {
+          beforeEach(function() {
+            m_card.associate.returns(true);
           });
 
-          describe('association succeeds', function() {
-            beforeEach(function() {
-              m_card.associate.returns(true);
-            });
+          it('should setup lanes for movement', function() {
+            $scope.takeAction(m_card);
+            sinon.assert.calledWith(movementService.moveToAssociate, m_card);
+          });
 
-            it('should setup lanes for movement', function() {
-              $scope.takeAction(m_card);
-              sinon.assert.calledWith(movementService.moveToAssociate, m_card);
-            });
+          it('should moveToAssociate for each associate of selected card', function() {
+            var moveFunction = function(){},
+                m_previouslySelectedCard = {};
+            cardService.selectedCard.returns(m_previouslySelectedCard);
+            movementService.moveToAssociate.returns(moveFunction);
+            $scope.takeAction(m_card);
+            sinon.assert.calledWith(cardService.forEachAssociate, m_previouslySelectedCard, moveFunction);
+          });
 
-            it('should moveToAssociate for each associate of selected card', function() {
-              var moveFunction = function(){},
-                  m_previouslySelectedCard = {};
-              cardService.selectedCard.returns(m_previouslySelectedCard);
-              movementService.moveToAssociate.returns(moveFunction);
-              $scope.takeAction(m_card);
-              sinon.assert.calledWith(cardService.forEachAssociate, m_previouslySelectedCard, moveFunction);
-            });
-
-            it('should clear selected cards', function() {
-              $scope.takeAction(m_card);
-              sinon.assert.calledOnce(cardService.clearSelected);
-            });
+          it('should clear selected cards', function() {
+            $scope.takeAction(m_card);
+            sinon.assert.calledOnce(cardService.clearSelected);
           });
         });
+      });
+    });
+
+  });
+
+  describe('Watchers', function() {
+
+    describe('lanes', function() {
+      var newLanesVal = [];
+      beforeEach(function() {
+        $scope.lanes = newLanesVal;
+      });
+
+      it('should auto associate when lanes have changed', function() {
+        $scope.$digest();
+        sinon.assert.calledWith(upkeepService.autoAssociate, newLanesVal);
+      });
+
+      it('should clean-up empty lanes when lanes have changed', function() {
+        $scope.lanes = newLanesVal;
+        $scope.$digest();
+        sinon.assert.calledWith(upkeepService.emptyLaneCleanup, newLanesVal);
+      });
+
+      afterEach(function() {
+        $scope.lanes = undefined;
       });
 
     });
 
-    describe('Free Cell Actions', function() {
-      
-      describe('cell unoccupied', function() {
-        var cell, m_card;
-
-        beforeEach(function() {
-          cell = [];
-          m_card = {};
-          cardService.selectedCard.returns(m_card);
-        });
-
-        it('should move previously selected card to selected free cell', function() {
-          sinon.spy(cell, 'push');
-          $scope.freeCellAction(cell);
-          sinon.assert.calledWith(cell.push, m_card);
-        });
-
-        it('should clear selected after occupying a free cell', function() {
-          $scope.freeCellAction(cell);
-          sinon.assert.calledWith(cardService.clearSelected, m_card);
-        });
-
-        it('should remove previously selected card from it\'s lane', function() {
-          var removeFrom = [m_card];
-          sinon.spy(removeFrom, 'pop');
-          laneService.laneContaining.withArgs(m_card).returns(removeFrom);
-          $scope.freeCellAction(cell);
-          sinon.assert.calledOnce(removeFrom.pop);
-        });
+    describe('free-cells', function() {
+      var newFreeCellsVal;
+      beforeEach(function() {
+        $scope.freeCells = newFreeCellsVal;
+      });
+      it('should clean-up empty free-cells when cells have changed', function() {
+        $scope.$digest();
+        sinon.assert.calledWith(upkeepService.emptyLaneCleanup, newFreeCellsVal);
       });
 
-      describe('cell occupied', function() {
-        
-        it('should not attempt to add another card', function() {
-          var m_card = {},
-              cell = [cell];
-          sinon.spy(cell, 'push');
-          $scope.freeCellAction(cell);
-          sinon.assert.notCalled(cell.push);
-         });
-
-        
+      afterEach(function() {
+        $scope.newFreeCellsVal = undefined;
       });
-
-
 
     });
   });
+
+  describe('Free Cell Actions', function() {
+    var m_card = {
+          associate: sinon.stub()
+        },
+        nullCard = {isNull: true},
+        moveFunc = function() {};
+
+    beforeEach(function() {
+        m_card.associate.returns(undefined);
+        cardService.selectedCard.returns(m_card);
+    });
+
+    describe('unoccupied cell', function() {
+
+      it('should only move if cell is unoccupied', function() {
+        $scope.freeCellAction({isNull: false});
+        sinon.assert.notCalled(cardService.forEachAssociate);
+      });
+
+      it('should move previously selected card into new spot', function() {
+        movementService.moveToAssociate.withArgs(nullCard).returns(moveFunc);
+        $scope.freeCellAction(nullCard);
+        sinon.assert.calledWith(cardService.forEachAssociate, m_card, moveFunc);
+      });
+
+      it('should only move previously selected card if it has no associates', function() {
+        m_card.associate.returns({});
+        $scope.freeCellAction(nullCard);
+        sinon.assert.notCalled(cardService.forEachAssociate);
+      });
+
+      it('should clear selected', function() {
+        $scope.freeCellAction(nullCard);
+        sinon.assert.calledWith(cardService.clearSelected, m_card);
+      });
+
+      it('should not select unoccupied cell if there was no previously selected card', function() {
+        cardService.selectedCard.returns(undefined);
+        $scope.freeCellAction(nullCard);
+        expect(nullCard.selected).to.be.undefined;
+      });
+
+    });
+
+    describe('occupied cell', function() {
+      it('should select card occupying cell', function() {
+        $scope.freeCellAction(m_card);
+        sinon.assert.calledWith(cardService.selectCard, m_card);
+      });
+    });
+
+
+  });
+});

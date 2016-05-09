@@ -68,5 +68,39 @@ describe("Card", function() {
 
   });
 
+  describe('null card', function() {
+    var nullCard = Card.NULL_CARD();
+    it('should have empty string for suit', function() {
+      expect(nullCard).to.have.property('suit').that.equals("");
+    }); 
+
+    it('should have empty string for value', function() {
+      expect(nullCard).to.have.property('value').that.equals("");
+    });
+
+    it('should have a isNull field as true', function() {
+      expect(nullCard).to.have.property('isNull').that.equals(true);
+    });
+
+    describe('associate function', function() {
+      it('should return false if passed a null card', function() {
+        expect(nullCard.associate({isNull: true})).to.be.false;
+      });
+
+      it('should return fasle if passed undefined', function() {
+        expect(nullCard.associate(undefined)).to.be.false;
+      });
+
+      it('should return true for not null card', function() {
+        expect(nullCard.associate({})).to.be.true;
+      });
+    });
+
+    it('should return a new instance each time', function() {
+      expect(nullCard).to.not.equal(Card.NULL_CARD());
+    });
+
+  });
+
 
 });
