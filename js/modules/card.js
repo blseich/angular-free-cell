@@ -43,4 +43,14 @@ function Card(value, suit) {
     disassociate: disassociate
   };
 }
+Card.NULL_CARD = function(){
+  return {
+    suit: "",
+    value: "",
+    associate: function(card) {
+      return !!card && !card.isNull;
+    },
+    isNull: true
+  };
+};
 

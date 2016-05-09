@@ -1,7 +1,7 @@
 describe('Movement Service', function() {
   var movementService,
       cardService,
-      laneService,
+      locationService,
       _mockCard,
       m_cardToAssociateWith,
       m_card;
@@ -18,23 +18,23 @@ describe('Movement Service', function() {
     $provide.service('cardService', function() {
       this.selectedCard = sinon.stub();
     });
-    $provide.service('laneService', function() {
-      this.isFirstInLane = sinon.stub();
+    $provide.service('locationService', function() {
+      this.isSelectable = sinon.stub();
       this.laneContaining = sinon.stub();
     });
   }));
   
-  beforeEach(inject(function(_movementService_, _cardService_, _laneService_) {
+  beforeEach(inject(function(_movementService_, _cardService_, _locationService_) {
     movementService = _movementService_;
     cardService = _cardService_;
-    laneService = _laneService_;
+    locationService = _locationService_;
   }));
 
   beforeEach(function() {
     m_card = _mockCard();
     m_cardToAssociateWith = _mockCard();
     m_cardToAssociateWith.associate.returns(false);
-    laneService.isFirstInLane.returns(true);
+    locationService.isSelectable.returns(true);
     cardService.selectedCard.returns(m_card);
   });
 
@@ -45,7 +45,7 @@ describe('Movement Service', function() {
     });
 
     it('should return false if passed card is not first in the lane', function() {
-      laneService.isFirstInLane.returns(false);
+      locationService.isSelectable.returns(false);
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.false;
     });
 
@@ -56,7 +56,7 @@ describe('Movement Service', function() {
 
     it('should return true if card is selected and passed card does not have associates passed card is first in lane and association succeeds', function() {
       m_cardToAssociateWith.associate.returns(false);
-      laneService.isFirstInLane.returns(true);
+      locationService.isSelectable.returns(true);
       cardService.selectedCard.returns(m_card);
       expect(movementService.isLegalMove(m_cardToAssociateWith)).to.be.true;
     });
@@ -70,8 +70,8 @@ describe('Movement Service', function() {
       m_removalLane = [m_card];
       m_additionLane = [m_cardToAssociateWith];
       cardService.selectedCard.returns(m_card);
-      laneService.laneContaining.withArgs(m_card).returns(m_removalLane);
-      laneService.laneContaining.withArgs(m_cardToAssociateWith).returns(m_additionLane);
+      locationService.laneContaining.withArgs(m_card).returns(m_removalLane);
+      locationService.laneContaining.withArgs(m_cardToAssociateWith).returns(m_additionLane);
     });
 
     it('should return a function', function() {

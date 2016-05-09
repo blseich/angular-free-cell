@@ -4,7 +4,7 @@ angular.module('factories')
         
     return {
       lanes: lanes,
-      stores: [[],[],[],[]],
+      freeCells: [[],[],[],[]],
       finished: [[],[],[],[]]
     };
   }])
