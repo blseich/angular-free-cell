@@ -5,6 +5,7 @@ var gulp = require('gulp'),
 gulp.task('default', function() {
   gulp.src([
     'js/modules/*.js',
+    'js/ng/app-definition.js',
     'js/ng/*/*-definition.js',
     'js/ng/*/*.js',
     'js/ng/app.js'

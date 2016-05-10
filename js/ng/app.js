@@ -1,5 +1,5 @@
-angular.module('FreeCell', ['factories', 'services'])
-  .controller('FreeCellController', 
+angular.module('FreeCell')
+.controller('FreeCellController', 
     [ '$scope',
       'playArea',
       'cardService',
@@ -42,18 +42,4 @@ angular.module('FreeCell', ['factories', 'services'])
           }
         };
 
-      }])
-  .directive('card', function($compile) {
-
-    return {
-      scope: {
-        value: '=value',
-        suit: '=suit',
-        selected: '=selected'
-      },
-      restrict: 'E',
-      templateUrl: 'card/card.html',
-      link: function(scope, el, attr) {}
-    };
-
-  });
+      }]);
