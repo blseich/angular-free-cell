@@ -11,7 +11,7 @@ describe('Card Service', function() {
 
   locationService = {
     isSelectable: sinon.stub(),
-    openCells: sinon.stub()
+    selectionLimit: sinon.stub()
   };
 
   beforeEach(module('services'));
@@ -19,8 +19,8 @@ describe('Card Service', function() {
   beforeEach(module(function($provide) {
     $provide.service('locationService', function() {
       this.isSelectable = locationService.isSelectable;
-      this.openCells = locationService.openCells;
-      locationService.openCells.returns(4);
+      this.selectionLimit = locationService.selectionLimit;
+      locationService.selectionLimit.returns(5);
     });
   }));
 
@@ -134,7 +134,7 @@ describe('Card Service', function() {
       m_card3 = _mockCard(m_card2),
       m_card4 = _mockCard(m_card3),
       m_card5 = _mockCard(m_card4);
-      locationService.openCells.returns(3);
+      locationService.selectionLimit.returns(4);
     });
 
     it("should allow selection of `[# of open cells] + 1` cards", function() {
