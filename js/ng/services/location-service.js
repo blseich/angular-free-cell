@@ -19,4 +19,11 @@ angular.module('services')
       return _search(lanes, card) || _search(freeCells, card);
     };
 
+    this.openCells = function() {
+      console.log(freeCells);
+      return freeCells.filter(function(el) {
+        return el.isNull;
+      }).length;
+    }
+
   }]);

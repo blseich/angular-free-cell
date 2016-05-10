@@ -56,4 +56,12 @@ describe('Lane Service', function() {
 
   });
 
+  describe('open cells', function() {
+    it("should return number of cells containing null cards", function() {
+      freeCells[0] = {isNull: true};
+      freeCells[1] = {isNull: true};
+      expect(locationService.openCells()).to.equal(2);
+    });
+  });
+
 });
