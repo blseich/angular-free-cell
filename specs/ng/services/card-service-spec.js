@@ -10,7 +10,8 @@ describe('Card Service', function() {
   };
 
   locationService = {
-    isSelectable: sinon.stub()
+    isSelectable: sinon.stub(),
+    openCells: sinon.stub()
   };
 
   beforeEach(module('services'));
@@ -18,6 +19,8 @@ describe('Card Service', function() {
   beforeEach(module(function($provide) {
     $provide.service('locationService', function() {
       this.isSelectable = locationService.isSelectable;
+      this.openCells = locationService.openCells;
+      locationService.openCells.returns(4);
     });
   }));
 
@@ -120,6 +123,36 @@ describe('Card Service', function() {
       expect(cardService.selectedCard()).to.be.undefined;
     });
 
+  });
+
+  describe('restricted selection', function() {
+    var m_card1, m_card2, m_card3, m_card4, m_card5;
+
+    beforeEach(function() {
+      m_card1 = _mockCard(),
+      m_card2 = _mockCard(m_card1),
+      m_card3 = _mockCard(m_card2),
+      m_card4 = _mockCard(m_card3),
+      m_card5 = _mockCard(m_card4);
+      locationService.openCells.returns(3);
+    });
+
+    it("should allow selection of `[# of open cells] + 1` cards", function() {
+      cardService.selectCard(m_card4);
+      expect(m_card1.selected).to.be.true;
+      expect(m_card2.selected).to.be.true;
+      expect(m_card3.selected).to.be.true;
+      expect(m_card4.selected).to.be.true;
+    });
+
+    it("should not allow selection of `[# of open cells] + 2` or greater", function() {
+      cardService.selectCard(m_card5);
+      expect(m_card1.selected).to.be.false;
+      expect(m_card2.selected).to.be.false;
+      expect(m_card3.selected).to.be.false;
+      expect(m_card4.selected).to.be.false;
+      expect(m_card5.selected).to.be.false;
+    });
   });
 
 });

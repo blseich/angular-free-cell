@@ -10,7 +10,7 @@ describe('Lane Service', function() {
       return {
         lanes: lanes,
         freeCells: freeCells
-      }
+      };
     });
   }));
 
@@ -54,6 +54,16 @@ describe('Lane Service', function() {
       expect(locationService.laneContaining(findCard)).to.equal(freeCells[0]);
     });
 
+  });
+
+  describe('open cells', function() {
+    it("should return number of cells containing null cards", function() {
+      freeCells[0] = [{isNull: true}];
+      freeCells[1] = [{}];
+      freeCells[2] = [{}];
+      freeCells[3] = [{}];
+      expect(locationService.openCells()).to.equal(1);
+    });
   });
 
 });

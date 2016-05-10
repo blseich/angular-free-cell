@@ -1,12 +1,26 @@
 angular.module('services')
   .service('cardService', ['locationService', function(locationService) {
-    var selected;
+    var selected, 
+        numberOfCardsSelected = 0;
+
+    function _select(card) {
+      card.selected = true;
+      numberOfCardsSelected = numberOfCardsSelected + 1;
+    }
+
+    function _deselect(card) {
+      card.selected = false;
+      numberOfCardsSelected = numberOfCardsSelected - 1;
+    }
+
     this.selectCard = function(newCard) {
-      _select = function(card) {card.selected = true;};
       this.clearSelected(selected);
       if (locationService.isSelectable(newCard) || newCard.associate()) {
         this.forEachAssociate(newCard, _select);
         selected = newCard;
+      }
+      if(numberOfCardsSelected > locationService.openCells() + 1) {
+        this.clearSelected(selected);
       }
       return selected;
     };
@@ -19,7 +33,6 @@ angular.module('services')
     };
 
     this.clearSelected = function(card) {
-      _deselect = function(card) {card.selected = false;};
       this.forEachAssociate(card, _deselect);
       selected = undefined;
     };
@@ -28,4 +41,4 @@ angular.module('services')
       return selected;
     };
 
-  }])
+  }]);
