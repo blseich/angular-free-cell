@@ -6,7 +6,7 @@ angular.module('services')
     function _select(card) {
       card.selected = true;
       numberOfCardsSelected = numberOfCardsSelected + 1;
-    };
+    }
 
     function _deselect(card) {
       card.selected = false;
@@ -19,9 +19,7 @@ angular.module('services')
         this.forEachAssociate(newCard, _select);
         selected = newCard;
       }
-      //console.log("\n\n\n\n" + numberOfCardsSelected + " ------- " + locationService.openCells() + "\n\n\n\n");
       if(numberOfCardsSelected > locationService.openCells() + 1) {
-        //console.log("clearing " + selected);
         this.clearSelected(selected);
       }
       return selected;
@@ -43,4 +41,4 @@ angular.module('services')
       return selected;
     };
 
-  }])
+  }]);

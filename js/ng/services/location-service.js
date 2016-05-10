@@ -20,7 +20,6 @@ angular.module('services')
     };
 
     this.openCells = function() {
-      console.log(freeCells);
       return freeCells.filter(function(el) {
         return el.isNull;
       }).length;

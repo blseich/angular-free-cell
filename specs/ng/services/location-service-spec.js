@@ -10,7 +10,7 @@ describe('Lane Service', function() {
       return {
         lanes: lanes,
         freeCells: freeCells
-      }
+      };
     });
   }));
 
