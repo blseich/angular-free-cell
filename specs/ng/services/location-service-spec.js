@@ -56,14 +56,43 @@ describe('Lane Service', function() {
 
   });
 
-  describe('open cells', function() {
-    it("should return number of cells containing null cards", function() {
-      freeCells[0] = [{isNull: true}];
-      freeCells[1] = [{}];
-      freeCells[2] = [{}];
-      freeCells[3] = [{}];
-      expect(locationService.openCells()).to.equal(1);
+  describe('selection restriction', function() {
+    function _mockCard() {
+      return {};
+    }
+
+
+    beforeEach(function() {
+      for(lane in lanes) {
+        lane[0] = _mockCard();
+      }
+      for(cell in freeCells) {
+        cell[0] = _mockCard();
+      }
     });
+
+    describe('no open lanes', function() {
+      it('should return number of cells containing null cards plus one', function() {
+        freeCells[0] = [{isNull: true}];
+        expect(locationService.selectionLimit()).to.equal(2);
+      });
+    });
+
+    describe('no open cells', function() {
+      it('should return number of lanes containing null cards times 2', function() {
+        lanes[0] = [{isNull: true}];
+        expect(locationService.selectionLimit()).to.equal(2);
+      });     
+    });
+
+    describe('open lanes and open cells', function() {
+      it('should return number of cells containing null cards plus one times double the number of open lanes', function() {
+        freeCells[0] = [{isNull: true}];
+        lanes[0] = [{isNull: true}];
+        expect(locationService.selectionLimit()).to.equal(4);
+      });
+    });
+
   });
 
 });

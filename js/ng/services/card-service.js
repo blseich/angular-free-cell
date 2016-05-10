@@ -19,7 +19,7 @@ angular.module('services')
         this.forEachAssociate(newCard, _select);
         selected = newCard;
       }
-      if(numberOfCardsSelected > locationService.openCells() + 1) {
+      if(numberOfCardsSelected > locationService.selectionLimit()) {
         this.clearSelected(selected);
       }
       return selected;

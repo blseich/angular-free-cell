@@ -9,6 +9,14 @@ angular.module('services')
       });
     }
 
+    function _numberOpen(area) {
+      return area.filter(function(collection) {
+        return collection.find(function(card){
+          return card.isNull;
+        });
+      }).length;
+    }
+
     this.isSelectable = function(card) {
       var laneContainingCard = this.laneContaining(card);
       return !!laneContainingCard && 
@@ -19,12 +27,10 @@ angular.module('services')
       return _search(lanes, card) || _search(freeCells, card);
     };
 
-    this.openCells = function() {
-      return freeCells.filter(function(cell) {
-        return !!cell.find(function(card) {
-          return card.isNull;
-        });
-      }).length;
+    this.selectionLimit = function() {
+      var openCells = _numberOpen(freeCells),
+          openLanes = _numberOpen(lanes);
+      return openLanes > 0 ? (openCells + 1) * openLanes * 2 : openCells + 1;
     }
 
   }]);
