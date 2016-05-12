@@ -44,3 +44,14 @@ angular.module('factories')
     };
 
   }]);
+
+function _createDeck() {
+  var deck = [];
+  for (var suit = 0; suit < 4; suit++) {
+    for (var val = 0; val < 13; val++) {
+      deck.push(new Card(values[val], suits[suit]));
+    }
+  }
+  return deck;
+}
+  
