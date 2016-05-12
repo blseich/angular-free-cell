@@ -37,8 +37,8 @@ describe('Play Area', function() {
     expect(playArea.freeCells).to.have.length(4);
   }));
 
-  it ('should have 4 finished', inject(function(playArea) {
-    expect(playArea.finished).to.have.length(4);
+  it ('should have 4 homeCells', inject(function(playArea) {
+    expect(playArea.homeCells).to.have.length(4);
   }));
 
   it ('should shuffle deck', inject(function(playArea) {

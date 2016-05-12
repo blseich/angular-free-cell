@@ -8,6 +8,17 @@ angular.module('FreeCell')
       function($scope, playArea, cardService, movementService, upkeepService) {
 
         $scope.$watch('lanes', function(newValue, oldValue) {
+          for(lane in newValue) {
+            var card = newValue[lane][6] || Card.NULL_CARD();
+            for(homeCell in $scope.homeCells) {
+              if($scope.homeCells[homeCell].length === 0) {
+                $scope.homeCells[homeCell].push(card);
+                break;
+              }
+            }
+            
+          }
+          // $scope.homeCells[0].push(newValue[0][6]);
           upkeepService.autoAssociate(newValue);
           upkeepService.emptyLaneCleanup(newValue);
         }, true);
@@ -20,6 +31,7 @@ angular.module('FreeCell')
         
         $scope.lanes = playArea.lanes;
         $scope.freeCells = playArea.freeCells;
+        $scope.homeCells = playArea.homeCells;
 
         $scope.takeAction = function(card) {
           var previouslySelected = cardService.selectedCard();

@@ -121,9 +121,19 @@ describe('Controller', function() {
   describe('Watchers', function() {
 
     describe('lanes', function() {
-      var newLanesVal = [];
+      var newLanesVal = [[],[],[],[],[],[],[],[]];
+
+      var aceOfSpades, aceOfHearts;
+
       beforeEach(function() {
         $scope.lanes = newLanesVal;
+        $scope.homeCells = [
+          [], 
+          [], 
+          [], 
+          []];
+        aceOfSpades = {val: 'A', suit: 'S'};
+        aceOfHearts = {val: 'A', suit: 'H'};
       });
 
       it('should auto associate when lanes have changed', function() {
@@ -132,9 +142,29 @@ describe('Controller', function() {
       });
 
       it('should clean-up empty lanes when lanes have changed', function() {
-        $scope.lanes = newLanesVal;
         $scope.$digest();
         sinon.assert.calledWith(upkeepService.emptyLaneCleanup, newLanesVal);
+      });
+
+      it('should send Ace in first position to first empty homeCell', function() {
+        $scope.lanes[0][6] = aceOfSpades;
+        $scope.$digest();
+        expect($scope.homeCells[0]).to.contain(aceOfSpades);
+      });
+
+      it('should send another Ace to next unoccupied home cell', function() {
+        $scope.lanes[0][6] = aceOfHearts;
+        $scope.homeCells[0].push(aceOfSpades);
+        $scope.$digest();
+        expect($scope.homeCells[1]).to.contain(aceOfHearts);
+      });
+
+      it('should only send card to one home cell', function() {
+        $scope.lanes[0][6] = aceOfSpades;
+        $scope.$digest();
+        expect($scope.homeCells[1]).not.to.contain(aceOfSpades);
+        expect($scope.homeCells[2]).not.to.contain(aceOfSpades);
+        expect($scope.homeCells[3]).not.to.contain(aceOfSpades);
       });
 
       afterEach(function() {
@@ -211,6 +241,6 @@ describe('Controller', function() {
       });
     });
 
-
   });
+
 });
