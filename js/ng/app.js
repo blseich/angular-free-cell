@@ -10,12 +10,11 @@ angular.module('FreeCell')
         $scope.$watch('lanes', function(newValue, oldValue) {
           for(lane in newValue) {
             var card = newValue[lane][6] || Card.NULL_CARD();
-            for(homeCell in $scope.homeCells) {
-              if($scope.homeCells[homeCell].length === 0) {
-                $scope.homeCells[homeCell].push(card);
-                break;
+              if(card.val === 'A') {
+                $scope.homeCells.find(function(cell){
+                  return cell.length === 0;
+                }).push(card);
               }
-            }
             
           }
           // $scope.homeCells[0].push(newValue[0][6]);
