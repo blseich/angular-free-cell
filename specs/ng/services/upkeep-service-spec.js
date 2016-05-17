@@ -56,6 +56,18 @@ describe('Upkeep Service', function() {
         sinon.assert.calledWith(m_thirdAssociateCard.associate, m_secondAssociateCard);
     });
 
+    describe('null card', function() {
+      it('should not call disassocaite on a null card', function() {
+        var m_nullCard = {
+          isNull: true,
+          disassociate: sinon.stub()
+        }
+        lanes[0] = [m_nullCard];
+        upkeepService.autoAssociate(lanes);
+        sinon.assert.notCalled(m_nullCard.disassociate);
+      });
+    });
+
   });
 
   describe('Empty Lane Cleanup', function() {

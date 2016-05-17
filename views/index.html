@@ -63,17 +63,17 @@
          <div class="top">
           <div class="home-cells">
             <div class="home-cell" ng-repeat="homeCell in homeCells">
-              <card suit="homeCell[homeCell.length - 1].suit" value="homeCell[homeCell.length - 1].val"></card>
+              <card suit="homeCell[homeCell.length - 1].suit" value="homeCell[homeCell.length - 1].value"></card>
             </div>
           </div>
           <div class="free-cells">
             <div class="free-cell" ng-repeat="cell in freeCells">
-              <card ng-repeat="card in cell" suit="card.suit" value="card.val" selected="card.selected" ng-click="freeCellAction(card)"></card>
+              <card ng-repeat="card in cell" suit="card.suit" value="card.value" selected="card.selected" ng-click="freeCellAction(card)"></card>
             </div>
           </div>
          </div>
          <div class="lane" ng-repeat="lane in lanes">
-          <card ng-repeat="card in lane" suit="card.suit" value="card.val" selected="card.selected" ng-click="takeAction(card)"></card>
+          <card ng-repeat="card in lane" suit="card.suit" value="card.value" selected="card.selected" ng-click="takeAction(card)"></card>
         </div>
       <!-- </div> -->
     </div>

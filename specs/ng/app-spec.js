@@ -1,7 +1,7 @@
 describe('Controller', function() {
   var $scope,
       $controller,
-      cardService, upkeepService, movementService,
+      cardService, upkeepService, movementService, homeCellService,
       m_card, m_cardToAssociateWith;
 
   beforeEach(module('FreeCell'));
@@ -21,15 +21,19 @@ describe('Controller', function() {
       this.isLegalMove = sinon.stub();
       this.moveToAssociate = sinon.stub();
     });
+    $provide.service('homeCellService', function() {
+      this.availableCell = sinon.stub();
+    });
   }));
 
-  beforeEach(inject(function($rootScope, _$controller_, _cardService_, _movementService_, _upkeepService_){
+  beforeEach(inject(function($rootScope, _$controller_, _cardService_, _movementService_, _upkeepService_, _homeCellService_){
     // The injector unwraps the underscores (_) from around the parameter names when matching
     $controller = _$controller_;
     $scope = $rootScope.$new();
     cardService = _cardService_;
     movementService = _movementService_;
     upkeepService = _upkeepService_;
+    homeCellService = _homeCellService_;
     $controller('FreeCellController', {$scope: $scope});
 
     //setup stubbed objects
@@ -123,17 +127,9 @@ describe('Controller', function() {
     describe('lanes', function() {
       var newLanesVal = [[],[],[],[],[],[],[],[]];
 
-      var aceOfSpades, aceOfHearts;
 
       beforeEach(function() {
         $scope.lanes = newLanesVal;
-        $scope.homeCells = [
-          [], 
-          [], 
-          [], 
-          []];
-        aceOfSpades = {val: 'A', suit: 'S'};
-        aceOfHearts = {val: 'A', suit: 'H'};
       });
 
       it('should auto associate when lanes have changed', function() {
@@ -145,32 +141,6 @@ describe('Controller', function() {
         $scope.$digest();
         sinon.assert.calledWith(upkeepService.emptyLaneCleanup, newLanesVal);
       });
-
-      it('should send Ace in first position to first empty homeCell', function() {
-        $scope.lanes[0][6] = aceOfSpades;
-        $scope.$digest();
-        expect($scope.homeCells[0]).to.contain(aceOfSpades);
-      });
-
-      it('should send another Ace to next unoccupied home cell', function() {
-        $scope.lanes[0][6] = aceOfHearts;
-        $scope.homeCells[0].push(aceOfSpades);
-        $scope.$digest();
-        expect($scope.homeCells[1]).to.contain(aceOfHearts);
-      });
-
-      it('should only send card to one home cell', function() {
-        $scope.lanes[0][6] = aceOfSpades;
-        $scope.$digest();
-        expect($scope.homeCells[1]).not.to.contain(aceOfSpades);
-        expect($scope.homeCells[2]).not.to.contain(aceOfSpades);
-        expect($scope.homeCells[3]).not.to.contain(aceOfSpades);
-      });
-
-      afterEach(function() {
-        $scope.lanes = undefined;
-      });
-
     });
 
     describe('free-cells', function() {
@@ -188,6 +158,59 @@ describe('Controller', function() {
       });
 
     });
+
+    describe('home-cells', function() {
+      it('should attempt to find available free cell for first card of lane', function() {
+        var testCard = {};
+        $scope.lanes = [[testCard], [],[],[],[],[],[],[]];
+        $scope.$digest();
+        sinon.assert.calledWith(homeCellService.availableCell, testCard);
+      });
+
+      it('should attempt to find available free cell for first card of each lane', function() {
+        $scope.$digest();
+        sinon.assert.callCount(homeCellService.availableCell, 8);
+      });
+
+      describe('there is an available cell', function() {
+        var finishedCard,
+          cardToMove,
+          availableHomeCell,
+          movementStub;
+
+        beforeEach(function() {
+          finishedCard = {'foo': 'bar'};
+          cardToMove = {};
+          availableHomeCell = [finishedCard];
+          $scope.lanes = [[{}, cardToMove], [],[],[],[],[],[],[],[]];
+          movementStub = sinon.stub();
+
+          homeCellService.availableCell.withArgs(cardToMove).returns(availableHomeCell);
+          movementService.moveToAssociate.withArgs(finishedCard, cardToMove).returns(movementStub);
+        });
+
+        it('should move first card of lane to found available cell', function() {
+          $scope.$digest();
+          sinon.assert.calledWith(movementStub, cardToMove);
+        });
+      });
+
+      describe('there is not an available cell', function() {
+        var cardToMove;
+
+        beforeEach(function() {
+          cardToMove = {};
+          $scope.lanes = [[{}, cardToMove], [],[],[],[],[],[],[],[]];
+        });
+
+        it('should not call move', function() {
+          $scope.$digest();
+          sinon.assert.notCalled(movementService.moveToAssociate);
+        });
+      });
+
+    });
+
   });
 
   describe('Free Cell Actions', function() {

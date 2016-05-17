@@ -5,19 +5,19 @@ angular.module('FreeCell')
       'cardService',
       'movementService',
       'upkeepService',
-      function($scope, playArea, cardService, movementService, upkeepService) {
+      'homeCellService',
+      function($scope, playArea, cardService, movementService, upkeepService, homeCellService) {
 
         $scope.$watch('lanes', function(newValue, oldValue) {
-          for(lane in newValue) {
-            var card = newValue[lane][6] || Card.NULL_CARD();
-              if(card.val === 'A') {
-                $scope.homeCells.find(function(cell){
-                  return cell.length === 0;
-                }).push(card);
-              }
-            
-          }
-          // $scope.homeCells[0].push(newValue[0][6]);
+          newValue.forEach(function(lane){ 
+            var cardToExamine = lane[lane.length - 1],
+              availableHomeCell = homeCellService.availableCell(cardToExamine);
+
+            if (!!availableHomeCell) {
+              movementService.moveToAssociate(availableHomeCell[0], cardToExamine)(cardToExamine);
+            }
+
+          });
           upkeepService.autoAssociate(newValue);
           upkeepService.emptyLaneCleanup(newValue);
         }, true);

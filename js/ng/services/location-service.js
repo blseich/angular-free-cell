@@ -1,7 +1,8 @@
 angular.module('services')
   .service('locationService', ['playArea', function(playArea) {
     var lanes = playArea.lanes,
-        freeCells = playArea.freeCells;
+        freeCells = playArea.freeCells,
+        homeCells = playArea.homeCells;
 
     function _search(area, card) {
       return area.find(function(collection) {
@@ -24,13 +25,13 @@ angular.module('services')
     };
 
     this.laneContaining = function(card) {
-      return _search(lanes, card) || _search(freeCells, card);
+      return _search(lanes, card) || _search(freeCells, card) || _search(homeCells, card);
     };
 
     this.selectionLimit = function() {
       var openCells = _numberOpen(freeCells),
           openLanes = _numberOpen(lanes);
       return openLanes > 0 ? (openCells + 1) * openLanes * 2 : openCells + 1;
-    }
+    };
 
   }]);
