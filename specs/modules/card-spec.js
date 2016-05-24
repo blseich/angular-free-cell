@@ -10,7 +10,7 @@ describe("Card", function() {
   
   it("should have suit and val", function() {
     expect(underTest.suit).to.equal(spade_BLACK_CARD);
-    expect(underTest.val).to.equal("3");
+    expect(underTest.value).to.equal("3");
   });
 
   describe('association', function() {

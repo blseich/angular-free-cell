@@ -4,8 +4,8 @@ angular.module('factories')
         
     return {
       lanes: lanes,
-      freeCells: [[],[],[],[]],
-      homeCells: [[],[],[],[]]
+      freeCells: [[Card.NULL_CARD()],[Card.NULL_CARD()],[Card.NULL_CARD()],[Card.NULL_CARD()]],
+      homeCells: [[Card.NULL_CARD()],[Card.NULL_CARD()],[Card.NULL_CARD()],[Card.NULL_CARD()]]
     };
   }])
 

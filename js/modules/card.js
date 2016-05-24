@@ -1,6 +1,6 @@
 function Card(value, suit) {
   function _notLegalAssociate(associateCard) {
-    return _color(associateCard.suit) === _color(suit) || _numValue(value) - 1 !== _numValue(associateCard.val);
+    return _color(associateCard.suit) === _color(suit) || _numValue(value) - 1 !== _numValue(associateCard.value);
   }
 
   function _numValue(cardVal) {
@@ -35,7 +35,7 @@ function Card(value, suit) {
 
   return {
     //Fields
-    val: value,
+    value: value,
     suit: suit,
 
     //Functions

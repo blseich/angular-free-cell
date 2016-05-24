@@ -4,8 +4,8 @@ angular.module('services')
       return !!cardService.selectedCard() && locationService.isSelectable(card) && !card.associate();
     };
 
-    this.moveToAssociate = function(card) {
-      var cardToMove = cardService.selectedCard(),
+    this.moveToAssociate = function(card, cardToMove) {
+      var cardToMove = cardToMove || cardService.selectedCard(),
           removeFrom, addTo;
       removeFrom = locationService.laneContaining(cardToMove);
       addTo = locationService.laneContaining(card);

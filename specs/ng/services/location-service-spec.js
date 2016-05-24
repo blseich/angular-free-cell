@@ -1,15 +1,17 @@
 describe('Lane Service', function() {
-  var locationService, lanes;
+  var locationService, lanes, freeCells, homeCells;
 
   beforeEach(module('services'));
 
   beforeEach(module(function($provide) {
     lanes = [[],[],[],[],[],[],[],[]];
     freeCells = [[],[],[],[]];
+    homeCells = [[],[],[],[]];
     $provide.service('playArea', function() {
       return {
         lanes: lanes,
-        freeCells: freeCells
+        freeCells: freeCells,
+        homeCells: homeCells
       };
     });
   }));
@@ -52,6 +54,12 @@ describe('Lane Service', function() {
       var findCard = {};
       freeCells[0] = [findCard];
       expect(locationService.laneContaining(findCard)).to.equal(freeCells[0]);
+    });
+
+    it('should return home-cell containing card if it\'s not found in a lane or free-cell', function() {
+      var findCard = {};
+      homeCells[0] = [findCard];
+      expect(locationService.laneContaining(findCard)).to.equal(homeCells[0]);
     });
 
   });

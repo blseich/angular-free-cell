@@ -1,5 +1,4 @@
 describe('Play Area', function() {
-
   function _mockCard() {
     return {
       'selected': false,
@@ -37,8 +36,22 @@ describe('Play Area', function() {
     expect(playArea.freeCells).to.have.length(4);
   }));
 
-  it ('should have 4 finished', inject(function(playArea) {
-    expect(playArea.finished).to.have.length(4);
+  it ('should place null cards in free cells', inject(function(playArea) {
+    expect(playArea.freeCells[0][0].isNull).to.be.true;
+    expect(playArea.freeCells[1][0].isNull).to.be.true;
+    expect(playArea.freeCells[2][0].isNull).to.be.true;
+    expect(playArea.freeCells[3][0].isNull).to.be.true;
+  }));
+
+  it ('should have 4 homeCells', inject(function(playArea) {
+    expect(playArea.homeCells).to.have.length(4);
+  }));
+
+  it ('should place null cards in home cells', inject(function(playArea) {
+    expect(playArea.homeCells[0][0].isNull).to.be.true;
+    expect(playArea.homeCells[1][0].isNull).to.be.true;
+    expect(playArea.homeCells[2][0].isNull).to.be.true;
+    expect(playArea.homeCells[3][0].isNull).to.be.true;
   }));
 
   it ('should shuffle deck', inject(function(playArea) {
