@@ -1,5 +1,5 @@
 angular.module('services')
-  .service('upkeepService', ['locationService', function(locationService) {
+  .service('upkeepService', ['homeCellService', 'movementService', function(homeCellService, movementService) {
     this.autoAssociate = function(newLanes) {
       newLanes.forEach(function(lane) {
         var cardsLeftInLane = lane.length,
@@ -22,6 +22,17 @@ angular.module('services')
           lane.push(Card.NULL_CARD());
         } else if(lane.length > 1 && lane[0].isNull) {
           lane.splice(0, 1);
+        }
+      });
+    };
+
+    this.moveToFinished = function(newLanes) {
+      newLanes.forEach(function(lane){
+        var cardToExamine = lane[lane.length - 1],
+            availableHomeCell = homeCellService.availableCell(cardToExamine);
+
+        if (!!availableHomeCell) {
+          movementService.moveToAssociate(availableHomeCell[0], cardToExamine)(cardToExamine);
         }
       });
     };
