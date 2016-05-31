@@ -1,1 +1,1 @@
-angular.module('factories',[]);
+angular.module('factories', []);

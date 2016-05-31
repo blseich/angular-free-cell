@@ -12,7 +12,7 @@ angular.module('services')
 
     function _numberOpen(area) {
       return area.filter(function(collection) {
-        return collection.find(function(card){
+        return collection.find(function(card) {
           return card.isNull;
         });
       }).length;
@@ -20,7 +20,7 @@ angular.module('services')
 
     this.isSelectable = function(card) {
       var laneContainingCard = this.laneContaining(card);
-      return !!laneContainingCard && 
+      return !!laneContainingCard &&
         laneContainingCard.indexOf(card) === laneContainingCard.length - 1;
     };
 

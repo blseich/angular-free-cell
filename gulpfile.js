@@ -1,9 +1,11 @@
 var gulp = require('gulp'),
     connect = require('gulp-connect'),
     concat = require('gulp-concat'),
-    Server = require('karma').Server;
+    Server = require('karma').Server,
+    jscs = require('gulp-jscs'),
+    notify = require('gulp-notify');
 
-gulp.task('default', ['test'], function() {
+gulp.task('default', ['lint', 'test'], function() {
   gulp.src([
     'js/modules/*.js',
     'js/ng/app-definition.js',
@@ -32,4 +34,10 @@ gulp.task('test', function(done) {
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done).start();
+});
+
+gulp.task('lint', function() {
+  gulp.src('js/**/*.js')
+        .pipe(jscs())
+        .pipe(jscs.reporter());
 });

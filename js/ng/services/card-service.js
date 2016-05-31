@@ -1,6 +1,6 @@
 angular.module('services')
   .service('cardService', ['locationService', function(locationService) {
-    var selected, 
+    var selected,
         numberOfCardsSelected = 0;
 
     function _select(card) {
@@ -19,14 +19,14 @@ angular.module('services')
         this.forEachAssociate(newCard, _select);
         selected = newCard;
       }
-      if(numberOfCardsSelected > locationService.selectionLimit()) {
+      if (numberOfCardsSelected > locationService.selectionLimit()) {
         this.clearSelected(selected);
       }
       return selected;
     };
 
     this.forEachAssociate = function(card, func) {
-      while(!!card) {
+      while (!!card) {
         func(card);
         card = card.associate();
       }
