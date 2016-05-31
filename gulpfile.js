@@ -1,8 +1,9 @@
 var gulp = require('gulp'),
     connect = require('gulp-connect'),
-    concat = require('gulp-concat');
+    concat = require('gulp-concat'),
+    Server = require('karma').Server;
 
-gulp.task('default', function() {
+gulp.task('default', ['test'], function() {
   gulp.src([
     'js/modules/*.js',
     'js/ng/app-definition.js',
@@ -24,4 +25,11 @@ gulp.task('server', ['default'], function() {
     port: 8000,
     livereload: true
   });
+});
+
+gulp.task('test', function(done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, done).start();
 });
