@@ -1,0 +1,42 @@
+{
+  "name": "free-cell",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "angular-mocks": "^1.5.3",
+    "gulp-server": "^0.1.0",
+    "chai": "^3.5.0",
+    "gulp-connect": "^3.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-webserver": "^0.9.1",
+    "karma-chai": "^0.1.0",
+    "karma": "^0.13.21",
+    "karma-chai-plugins": "^0.7.0",
+    "gulp-notify": "^2.2.0",
+    "karma-chrome-launcher": "^0.2.2",
+    "gulp": "^3.9.1",
+    "karma-mocha-reporter": "^1.2.3",
+    "karma-mocha": "^0.2.2",
+    "karma-sinon": "^1.0.4",
+    "karma-coverage": "^1.0.0",
+    "gulp-jscs": "^3.0.2",
+    "requirejs": "^2.1.22",
+    "karma-requirejs": "^0.2.5",
+    "sinon": "^1.17.3",
+    "mocha": "^2.4.5"
+  },
+  "dependencies": {
+    "angular": "^1.5.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blseich/angular-free-cell.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blseich/angular-free-cell/issues"
+  },
+  "homepage": "https://github.com/blseich/angular-free-cell#readme"
+}
