@@ -1,1 +1,1 @@
-angular.module('FreeCell', ['factories', 'services']);
+angular.module('FreeCell', ['ngAnimate', 'factories', 'services']);

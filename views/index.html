@@ -47,9 +47,21 @@
         border: solid 8px;
         border-color: #0073E8;
       }
+
+      .card-move.card-move-active {
+        transition: all 3s ease;
+        top: 0;
+      }
+
+      .card-move {
+        position: relative;
+        top: 26px;
+      }
+
+
     </style>
 
-    <script src="../vendor/angular.js"></script>
+    <script src="../vendor/vendor.js"></script>
   </head>
   <body ng-app="FreeCell">
     <div class="header">
@@ -73,7 +85,7 @@
           </div>
          </div>
          <div class="lane" ng-repeat="lane in lanes">
-          <card ng-repeat="card in lane" suit="card.suit" value="card.value" selected="card.selected" ng-click="takeAction(card)"></card>
+          <card ng-repeat="card in lane" suit="card.suit" value="card.value" selected="card.selected" ng-click="takeAction(card)" class="card-container"></card>
         </div>
       <!-- </div> -->
     </div>

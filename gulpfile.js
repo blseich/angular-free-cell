@@ -5,7 +5,11 @@ var gulp = require('gulp'),
     jscs = require('gulp-jscs'),
     notify = require('gulp-notify');
 
-gulp.task('default', ['lint', 'test'], function() {
+gulp.task('default', ['build', 'lint', 'test'], function() {
+  
+});
+
+gulp.task('build', function() {
   gulp.src([
     'js/modules/*.js',
     'js/ng/app-definition.js',
@@ -17,11 +21,15 @@ gulp.task('default', ['lint', 'test'], function() {
     .pipe(gulp.dest('build/js'));
   gulp.src('views/**/*.html')
     .pipe(gulp.dest('build/views'));
-  gulp.src('bower_components/angular/angular.js')
+  gulp.src([
+      'node_modules/angular/angular.js',
+      'node_modules/angular-animate/angular-animate.js']
+    )
+    .pipe(concat('vendor.js'))
     .pipe(gulp.dest('build/vendor'));
 });
 
-gulp.task('server', ['default'], function() {
+gulp.task('server', ['build'], function() {
   connect.server({
     root: ['build'],
     port: 8000,
