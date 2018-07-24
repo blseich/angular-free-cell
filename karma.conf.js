@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '/Users/br5g8ch/dev/workspaces/angular-works/free-cell/',
+    basePath: './',
 
 
     // frameworks to use

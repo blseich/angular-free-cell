@@ -17,7 +17,7 @@ gulp.task('default', ['lint', 'test'], function() {
     .pipe(gulp.dest('build/js'));
   gulp.src('views/**/*.html')
     .pipe(gulp.dest('build/views'));
-  gulp.src('bower_components/angular/angular.js')
+  gulp.src('node_modules/angular/angular.js')
     .pipe(gulp.dest('build/vendor'));
 });
 
